@@ -13,39 +13,29 @@
         <p>Aucun lancement à venir trouvé.</p>
       </div>
     </section>
+    <section>
+      <h2>Liste des Lancements</h2>
+      <launch-list />
+    </section>
   </main>
 </template>
 
-<style scoped></style>
 <script lang="ts">
-// Import Vue Composition API functions
 import { ref, onMounted } from "vue";
-// Import Launch type definition (make sure you have this type defined in your project)
 import type { Launch } from "./types/spacex";
+import { fetchNextLaunch } from "./types/spacex";
+import LaunchList from "./components/LaunchList.vue";
 
 export default {
+  components: {
+    LaunchList,
+  },
   setup() {
     // Reactive variable to hold the launch data, initially null
     const launch = ref<Launch | null>(null);
 
     // Reactive variable to hold the countdown in seconds
     const countdown = ref<number>(0);
-
-    // Function to fetch next launch data from the SpaceX API
-    const fetchLaunch = async () => {
-      // Fetch the next launch JSON data from the API
-      const res = await fetch("https://api.spacexdata.com/v4/launches/next");
-      // Parse the JSON response and type it as Launch
-      const data: Launch = await res.json();
-      // Assign fetched launch data to the reactive launch variable
-      launch.value = data;
-
-      // Immediately update the countdown using the launch date
-      updateCountdown(new Date(data.date_utc));
-
-      // Set up a timer to update the countdown every second (1000ms)
-      setInterval(() => updateCountdown(new Date(data.date_utc)), 1000);
-    };
 
     // Function to update countdown based on current time and launch date
     const updateCountdown = (launchDate: Date) => {
@@ -56,9 +46,17 @@ export default {
         Math.floor((launchDate.getTime() - now.getTime()) / 1000)
       );
     };
+    const fetchLaunch = async () => {
+      launch.value = await fetchNextLaunch();
+      updateCountdown(new Date(launch.value.date_utc));
+      // toutes les 1000 millisecondes(secondes), la fonction updateCountdown est appelée pour mettre à jour le compte à rebours
+      setInterval(
+        () => updateCountdown(new Date(launch.value!.date_utc)),
+        1000
+      ); // Le point d'exclamation (!) est utilisé pour indiquer à TypeScript que launch.value n'est pas null ici
+    };
 
-    // onMounted lifecycle hook runs once when component is mounted to the DOM
-    // We use it to start fetching launch data
+    // Fetch the next launch data when the component is mounted(displayed in the browser)
     onMounted(fetchLaunch);
 
     // Return the reactive variables so the template can use them
@@ -69,3 +67,5 @@ export default {
   },
 };
 </script>
+
+<style scoped></style>
