@@ -14,8 +14,8 @@
       </div>
     </section>
     <section>
-      <h2>Liste des Lancements</h2>
-      <launch-list />
+      <h2>Liste Des Lancements</h2>
+      <LaunchList />
     </section>
   </main>
 </template>
