@@ -8,7 +8,12 @@
   <!-- Liste des lancements filtrés -->
   <ul>
     <!-- Boucle sur chaque lancement filtré -->
-    <li v-for="launch in filteredLaunches" :key="launch.name">
+    <li
+      v-for="launch in filteredLaunches"
+      :key="launch.name"
+      @click="selectLaunch(launch)"
+      style="cursor: pointer"
+    >
       {{ launch.name }}
       <span v-if="launch.success">✅</span>
       <span v-if="launch.success === false">❌</span>
@@ -16,6 +21,13 @@
   </ul>
   <!-- Composant enfant qui reçoit la prop 'filter' pour afficher les 10 derniers lancements filtrés -->
   <LastLaunch :filter="filter" />
+
+  <!-- Modal affichant les détails d'un lancement sélectionné -->
+  <LaunchModal
+    v-if="selectedLaunch"
+    :launch="selectedLaunch"
+    @close="selectedLaunch = null"
+  />
 </template>
 <script lang="ts">
 import type { Launch } from "../types/spacex";
@@ -23,11 +35,13 @@ import LastLaunch from "./LastLaunch.vue";
 
 import { fetchAllLaunches } from "../types/spacex";
 import { ref, computed, onMounted } from "vue";
+import LaunchModal from "./LaunchModal.vue";
 
 export default {
   name: "LaunchList",
   components: {
-    LastLaunch, // Déclare le composant enfant
+    LastLaunch,
+    LaunchModal, // Déclare le composant enfant
   },
 
   setup() {
@@ -35,10 +49,17 @@ export default {
     const launches = ref<Launch[]>([]);
     // Variable réactive pour le filtre sélectionné
     const filter = ref("all");
+    // Variable réactive pour le lancement sélectionné (pour le modal)
+    const selectedLaunch = ref<Launch | null>(null);
 
     // Fonction pour charger tous les lancements depuis l'API
     const fetchLaunches = async () => {
       launches.value = await fetchAllLaunches();
+    };
+
+    // Fonction appelée lors du clic sur un lancement pour ouvrir le modal
+    const selectLaunch = (launch: Launch) => {
+      selectedLaunch.value = launch;
     };
 
     // Liste filtrée selon la valeur du filtre
@@ -54,7 +75,7 @@ export default {
     onMounted(fetchLaunches);
 
     // Rend les variables et fonctions accessibles dans le template
-    return { filter, filteredLaunches };
+    return { filter, filteredLaunches, selectLaunch, selectedLaunch };
   },
 };
 </script>

@@ -3,7 +3,12 @@
     <h2>Derniers Lancements</h2>
     <ul>
       <!-- Boucle sur les lancements filtrés et affiche chaque lancement -->
-      <li v-for="launch in filteredLaunches" :key="launch.name">
+      <li
+        v-for="launch in filteredLaunches"
+        :key="launch.name"
+        @click="selectLaunch(launch)"
+        style="cursor: pointer"
+      >
         {{ launch.name }} -{{ new Date(launch.date_utc).toLocaleString() }} -
         <span>{{
           launch.success === true
@@ -14,15 +19,25 @@
         }}</span>
       </li>
     </ul>
+    <!--modal affichant les détails d'un lancement sélectionné -->
+    <LaunchModal
+      v-if="selectedLaunch"
+      :launch="selectedLaunch"
+      @close="selectedLaunch = null"
+    />
   </section>
 </template>
 <script lang="ts">
 import { ref, computed, onMounted } from "vue";
 import type { Launch } from "../types/spacex";
 import { fetchLastLaunches } from "../types/spacex";
+import LaunchModal from "./LaunchModal.vue";
 
 export default {
   name: "LastLaunch",
+  components: {
+    LaunchModal, // Déclare le composant enfant pour afficher les détails d'un lancement
+  },
   // Déclare la prop 'filter' attendue depuis le parent
   props: {
     filter: {
@@ -33,6 +48,8 @@ export default {
   setup(props) {
     // Variable réactive pour stocker tous les lancements récupérés
     const launches = ref<Launch[]>([]);
+    // Variable réactive pour le lancement sélectionné (pour le modal)
+    const selectedLaunch = ref<Launch | null>(null);
 
     // Au montage du composant, récupère les 200 derniers lancements
     onMounted(async () => {
@@ -53,10 +70,16 @@ export default {
       }
       return filtered.slice(0, 10);
     });
+    // Fonction appelée lors du clic sur un lancement pour ouvrir le modal
+    const selectLaunch = (launch: Launch) => {
+      selectedLaunch.value = launch;
+    };
 
     // Rend la liste filtrée disponible dans le template
     return {
       filteredLaunches,
+      selectLaunch,
+      selectedLaunch,
     };
   },
 };
