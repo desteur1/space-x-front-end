@@ -1,8 +1,8 @@
 <template>
-  <main class="text-3xl font-bold text-center">
-    <h1>SpaceX Launches</h1>
-    <section>
-      <h2>Prochain Lancement</h2>
+  <main class="mx-4 px-4 bg-blue-500">
+    <h1 class="text-center text-4xl py-4 text-white">SpaceX Launches</h1>
+    <section class="text-center">
+      <h2 class="text-xl mb-6">Prochain Lancement</h2>
       <div v-if="launch">
         <h2>{{ launch.name }}</h2>
         <p>{{ new Date(launch.date_utc).toUTCString() }}</p>
@@ -14,7 +14,7 @@
       </div>
     </section>
     <section>
-      <h2>Liste Des Lancements</h2>
+      <h2 class="text-center text-2xl my-8 text-white">Liste Des Lancements</h2>
       <LaunchList />
     </section>
   </main>
@@ -68,4 +68,8 @@ export default {
 };
 </script>
 
-<style scoped></style>
+<style scoped>
+/* h1 {
+  color: red;
+} */
+</style>

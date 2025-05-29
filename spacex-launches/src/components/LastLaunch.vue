@@ -1,24 +1,26 @@
 <template>
-  <section>
-    <h2>Derniers Lancements</h2>
+  <section class="text-center mt-8 pb-4">
+    <h2 class="text-2xl my-6 text-white">Derniers Lancements</h2>
     <ul>
       <!-- Boucle sur les lancements filtrés et affiche chaque lancement -->
       <li
         v-for="launch in filteredLaunches"
         :key="launch.name"
         @click="selectLaunch(launch)"
-        style="cursor: pointer"
+        class="w-full sm:w-2/3 lg:w-1/3 mx-auto mb-4 p-4 border rounded cursor-pointer hover:bg-gray-100 transition-colors duration-500 ease-in-out"
       >
         {{ launch.name }} -{{ new Date(launch.date_utc).toLocaleString() }} -
         <span>{{
           launch.success === true
-            ? "✅ Réussi"
+            ? "✅ "
             : launch.success === false
-            ? "❌ Échec"
+            ? "❌ "
             : "🕖 Inconnu"
         }}</span>
       </li>
     </ul>
+  </section>
+  <section>
     <!--modal affichant les détails d'un lancement sélectionné -->
     <LaunchModal
       v-if="selectedLaunch"
