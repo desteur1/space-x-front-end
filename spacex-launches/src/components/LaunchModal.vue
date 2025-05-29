@@ -2,9 +2,9 @@
   <main>
     <!-- modal Overlay , close  modal if we click out of the content -->
     <div class="modal-overlay" @click.self="close">
-      <div class="modal-content">
-        <button class="close-btn" @click="close">X</button>
-        <h2>{{ launch.name }}</h2>
+      <div class="text-center modal-content">
+        <button class="close-btn text-red-600" @click="close">X</button>
+        <h2 class="text-xl">{{ launch.name }}</h2>
         <p><strong>Date :</strong>{{ formatedDate }}</p>
         <p>
           <strong>Details :</strong>{{ launch.details || "No details found" }}
@@ -15,7 +15,7 @@
           v-if="launch.links?.patch?.small"
           :src="launch.links.patch.small"
           alt="Patch image"
-          style="max-width: 150px; margin-bottom: 1rem"
+          class="img-modal"
         />
         <!-- links to official article  if available -->
         <p v-if="launch.links?.article">
@@ -32,14 +32,14 @@
             Display video
           </label>
           <!-- display youtube video if showVideo is true(clicked) -->
-          <div v-if="showVideo">
+          <div v-if="showVideo" class="video-container">
             <!--display iframe youtube video if youtubeID is available -->
             <iframe
               v-if="youtubeID"
               :src="`https://www.youtube.com/embed/${youtubeID}`"
               frameborder="0"
               allowfullscreen
-              style="width: 100%; height: 315px"
+              class="w-full mb-4 h-[315px]"
             ></iframe>
             <p v-else>No video available</p>
           </div>
@@ -146,4 +146,54 @@ export default defineComponent({
   },
 });
 </script>
-<style scoped></style>
+<style scoped>
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 999;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  max-width: 700px;
+  width: 90%;
+  border-radius: 8px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto; /* Allow scrolling if content overflows */
+}
+
+.close-btn {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-weight: bold;
+  padding-right: 1rem;
+  border: none;
+  background: none;
+  font-size: 1.2rem;
+  cursor: pointer;
+  opacity: 0.6;
+}
+.close-btn:hover {
+  opacity: 1;
+}
+.img-modal {
+  max-width: 150px;
+  margin: auto;
+  padding: 1rem 0;
+}
+
+.video-container {
+  margin-top: 1rem;
+  text-align: center;
+}
+</style>

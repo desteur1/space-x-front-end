@@ -1,18 +1,18 @@
 <template>
   <!-- Sélecteur pour filtrer les lancements -->
-  <select v-model="filter">
+  <select v-model="filter" class="mb-4 bg-gray-100 p-2 rounded">
     <option value="all">Tous Lancements</option>
     <option value="success">Lancements Réussis</option>
     <option value="failed">Lancement Échoués</option>
   </select>
   <!-- Liste des lancements filtrés -->
-  <ul>
+  <ul class="grid grid-cols- sm:grid-cols-2 md:grid-cols-3 text-center gap-4">
     <!-- Boucle sur chaque lancement filtré -->
     <li
       v-for="launch in filteredLaunches"
       :key="launch.name"
       @click="selectLaunch(launch)"
-      style="cursor: pointer"
+      class="border rounded p-4 cursor-pointer hover:bg-gray-100 transition-colors"
     >
       {{ launch.name }}
       <span v-if="launch.success">✅</span>
@@ -79,4 +79,16 @@ export default {
   },
 };
 </script>
-<style scoped></style>
+<style scoped>
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+.launch-item {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+</style>
