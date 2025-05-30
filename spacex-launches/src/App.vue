@@ -2,7 +2,7 @@
   <main class="mx-4 px-4 bg-blue-500">
     <h1 class="text-center text-4xl py-4 text-white">SpaceX Launches</h1>
     <section class="text-center">
-      <h2 class="text-xl mb-6">Prochain Lancement</h2>
+      <h2 class="text-2xl my-6 text-white">Prochain Lancement</h2>
       <div v-if="launch">
         <h2>{{ launch.name }}</h2>
         <p>{{ new Date(launch.date_utc).toUTCString() }}</p>
