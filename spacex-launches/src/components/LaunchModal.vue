@@ -64,87 +64,72 @@
   </main>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, watch, computed } from "vue";
-import type { Launch, payload, Launchpad } from "../types/spacex";
+<script setup lang="ts">
+// Importation des fonctions et types nécessaires de Vue et de l'API SpaceX
+import { ref, watch, computed } from "vue";
+import type { Launch, Payload, Launchpad } from "../types/spacex";
 import { fetchPayloadById, fetchLaunchpadById } from "../types/spacex";
 
-export default defineComponent({
-  name: "LaunchModal",
-  // Declare the awaited props: Launch object with required type
-  props: {
-    launch: {
-      type: Object as () => Launch,
-      required: true,
-    },
-  },
-  // Declare the events 'close' to notify the parent component when the modal should be closed
-  emits: ["close"],
-  setup(props, { emit }) {
-    // Reactive variables to store payloads and launchpad data
-    const payloads = ref<payload[]>([]);
-    const launchpad = ref<Launchpad | null>(null);
-    // Reactive variable to control the visibility of the video
-    const showVideo = ref(false);
-    // Computed property to format the launch date in French format
-    const formatedDate = computed<string>(() => {
-      const date = new Date(props.launch.date_utc);
-      return date.toLocaleDateString("fr-FR", {
-        // day: "2-digit",
-        // month: "2-digit",
-        // year: "numeric",
-      });
-    });
-    // Computed property to extract the YouTube video ID from the launch links
-    const youtubeID = computed(() => {
-      const url = props.launch.links?.webcast;
-      if (!url) return null;
-      const match =
-        url.match(/youtube\.com\/watch\?v=([^&]+)/) ||
-        url.match(/youtu\.be\/([^?&]+)/);
-      return match ? match[1] : null;
-    });
-    // Functions to load payloads and launchpad data
-    const loadPayloads = async () => {
-      const ids = props.launch.payloads || [];
-      const loadPayloads = await Promise.all(
-        ids.map((id) => fetchPayloadById(id))
-      );
-      payloads.value = loadPayloads;
-    };
+// Déclare la prop 'launch' reçue du parent
+const props = defineProps<{ launch: Launch }>();
 
-    // Function to load information about the launchpad
-    const loadLaunchpad = async () => {
-      if (props.launch.launchpad) {
-        launchpad.value = await fetchLaunchpadById(props.launch.launchpad);
-      }
-    };
-    // Function to close the modal and emit the 'close' event
-    const close = () => {
-      emit("close");
-    };
-    // reload payloads and launchpad data when the launch prop changes
-    watch(
-      () => props.launch,
-      () => {
-        loadPayloads();
-        loadLaunchpad();
-        showVideo.value = false; // Reset video visibility when launch changes
-      },
+// Déclare l'événement 'close' pour fermer la modale
+const emit = defineEmits<{
+  (e: "close"): void;
+}>();
 
-      { immediate: true }
-    );
-    // Return reactive variables and functions to the template
-    return {
-      payloads,
-      launchpad,
-      showVideo,
-      formatedDate,
-      youtubeID,
-      close,
-    };
-  },
+// Variable réactive pour stocker les payloads associés au lancement
+const payloads = ref<Payload[]>([]);
+// Variable réactive pour stocker les infos du launchpad
+const launchpad = ref<Launchpad | null>(null);
+// Variable réactive pour afficher/masquer la vidéo
+const showVideo = ref(false);
+
+// Propriété calculée pour formater la date du lancement en français
+const formatedDate = computed(() => {
+  const date = new Date(props.launch.date_utc);
+  return date.toLocaleDateString("fr-FR");
 });
+
+// Propriété calculée pour extraire l'ID YouTube de la vidéo du lancement
+const youtubeID = computed(() => {
+  const url = props.launch.links?.webcast;
+  if (!url) return null;
+  const match =
+    url.match(/youtube\.com\/watch\?v=([^&]+)/) ||
+    url.match(/youtu\.be\/([^?&]+)/);
+  return match ? match[1] : null;
+});
+
+// Fonction pour charger les payloads associés au lancement
+const loadPayloads = async () => {
+  const ids = props.launch.Payload || [];
+  const loaded = await Promise.all(ids.map((id) => fetchPayloadById(id)));
+  payloads.value = loaded;
+};
+
+// Fonction pour charger les infos du launchpad
+const loadLaunchpad = async () => {
+  if (props.launch.launchpad) {
+    launchpad.value = await fetchLaunchpadById(props.launch.launchpad);
+  }
+};
+
+// Fonction pour fermer la modale (émet l'événement 'close')
+function close() {
+  emit("close");
+}
+
+// Recharge les données payloads/launchpad à chaque changement de lancement
+watch(
+  () => props.launch,
+  () => {
+    loadPayloads();
+    loadLaunchpad();
+    showVideo.value = false; // Réinitialise l'affichage de la vidéo
+  },
+  { immediate: true }
+);
 </script>
 <style scoped>
 .modal-overlay {

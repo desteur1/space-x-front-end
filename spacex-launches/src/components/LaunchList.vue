@@ -6,8 +6,7 @@
     <option value="failed">Lancement Échoués</option>
   </select>
   <!-- Liste des lancements filtrés -->
-  <ul class="grid grid-cols- sm:grid-cols-2 md:grid-cols-3 text-center gap-4">
-    <!-- Boucle sur chaque lancement filtré -->
+  <ul class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 text-center gap-4">
     <li
       v-for="launch in filteredLaunches"
       :key="launch.name"
@@ -29,56 +28,42 @@
     @close="selectedLaunch = null"
   />
 </template>
-<script lang="ts">
-import type { Launch } from "../types/spacex";
-import LastLaunch from "./LastLaunch.vue";
 
-import { fetchAllLaunches } from "../types/spacex";
+<script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
+import type { Launch } from "../types/spacex";
+import { fetchAllLaunches } from "../types/spacex";
+import LastLaunch from "./LastLaunch.vue";
 import LaunchModal from "./LaunchModal.vue";
 
-export default {
-  name: "LaunchList",
-  components: {
-    LastLaunch,
-    LaunchModal, // Déclare le composant enfant
-  },
+// Variables réactives
+const launches = ref<Launch[]>([]);
+const filter = ref("all");
+const selectedLaunch = ref<Launch | null>(null);
 
-  setup() {
-    // Variable réactive pour stocker tous les lancements
-    const launches = ref<Launch[]>([]);
-    // Variable réactive pour le filtre sélectionné
-    const filter = ref("all");
-    // Variable réactive pour le lancement sélectionné (pour le modal)
-    const selectedLaunch = ref<Launch | null>(null);
-
-    // Fonction pour charger tous les lancements depuis l'API
-    const fetchLaunches = async () => {
-      launches.value = await fetchAllLaunches();
-    };
-
-    // Fonction appelée lors du clic sur un lancement pour ouvrir le modal
-    const selectLaunch = (launch: Launch) => {
-      selectedLaunch.value = launch;
-    };
-
-    // Liste filtrée selon la valeur du filtre
-    const filteredLaunches = computed(() => {
-      if (filter.value === "success")
-        return launches.value.filter((launch) => launch.success === true);
-      if (filter.value === "failed")
-        return launches.value.filter((launch) => launch.success === false);
-      return launches.value;
-    });
-
-    // Appel de la fonction fetchLaunches dès que le composant est affiché à l’écran
-    onMounted(fetchLaunches);
-
-    // Rend les variables et fonctions accessibles dans le template
-    return { filter, filteredLaunches, selectLaunch, selectedLaunch };
-  },
+// Fonction pour charger tous les lancements depuis l'API
+const fetchLaunches = async () => {
+  launches.value = await fetchAllLaunches();
 };
+
+// Fonction appelée lors du clic sur un lancement pour ouvrir le modal
+const selectLaunch = (launch: Launch) => {
+  selectedLaunch.value = launch;
+};
+
+// Liste filtrée selon la valeur du filtre
+const filteredLaunches = computed(() => {
+  if (filter.value === "success")
+    return launches.value.filter((launch) => launch.success === true);
+  if (filter.value === "failed")
+    return launches.value.filter((launch) => launch.success === false);
+  return launches.value;
+});
+
+// Appel de la fonction fetchLaunches dès que le composant est affiché à l’écran
+onMounted(fetchLaunches);
 </script>
+
 <style scoped>
 ul {
   list-style-type: none;

@@ -12,10 +12,10 @@ export interface Launch {
     article: string | null;
   };
   launchpad: string;
-  payloads: string[];
+  Payload: string[];
 }
 // Interface répresentant payload
-export interface payload {
+export interface Payload {
   id: string;
   name: string;
   customers: string[];
@@ -55,7 +55,7 @@ export async function fetchLaunchById(id: string): Promise<Launch> {
   return await res.json();
 }
 // Fonction pour récupérer une charge(payload) par son ID
-export async function fetchPayloadById(id: string): Promise<payload> {
+export async function fetchPayloadById(id: string): Promise<Payload> {
   const res = await fetch(`https://api.spacexdata.com/v4/payloads/${id}`);
   return await res.json();
 }
